@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "SwitchLLM",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Seamlessly transfer conversation context from Claude to ChatGPT or Gemini with one click.",
   "permissions": [
     "activeTab",
@@ -10,7 +10,9 @@
   ],
   "browser_action": {
     "default_popup": "popup/popup.html",
-    "default_icon": "icons/icon.svg"
+    "default_icon": {
+      "48": "icons/icon.svg"
+    }
   },
   "background": {
     "scripts": ["background/background.js"],
@@ -34,9 +36,8 @@
     }
   ],
   "icons": {
-    "16": "icons/icon-16.png",
-    "48": "icons/icon-48.png",
-    "128": "icons/icon-128.png"
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg"
   },
   "browser_specific_settings": {
     "gecko": {
