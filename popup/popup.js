@@ -9,9 +9,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const statusText = document.getElementById('status-text');
   const infoSection = document.getElementById('info-section');
   const infoText = document.getElementById('info-text');
+  const statsPanel = document.getElementById('stats-panel');
+  const tokenCount = document.getElementById('token-count');
+  const charCount = document.getElementById('char-count');
+  const handoffsToday = document.getElementById('handoffs-today');
+  const handoffsTotal = document.getElementById('handoffs-total');
 
   // Check if we already have stored context
   loadStoredContext();
+  loadUsageStats();
 
   // Grab conversation from Claude
   btnGrab.addEventListener('click', async () => {
@@ -41,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateStatus(true, `Captured ${response.messageCount} messages`);
         enableSendButtons();
         showInfo(`Context ready! ${response.data.length} characters captured.`);
+        updateTokenStats(response.data);
         btnGrab.classList.add('success');
         setTimeout(() => btnGrab.classList.remove('success'), 300);
       } else {
@@ -71,9 +78,50 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStatus(false, 'No conversation captured');
     disableSendButtons();
     hideInfo();
+    statsPanel.style.display = 'none';
   });
 
   // --- Helper functions ---
+
+  function estimateTokens(text) {
+    // Rough estimate: ~4 characters per token
+    return Math.ceil(text.length / 4);
+  }
+
+  function updateTokenStats(conversationText) {
+    const tokens = estimateTokens(conversationText);
+    const chars = conversationText.length;
+    tokenCount.textContent = tokens.toLocaleString();
+    charCount.textContent = chars.toLocaleString();
+    statsPanel.style.display = 'block';
+  }
+
+  async function recordHandoff() {
+    const stored = await browser.storage.local.get(['handoffStats']);
+    const stats = stored.handoffStats || { total: 0, daily: {} };
+
+    const today = new Date().toISOString().split('T')[0];
+    stats.total += 1;
+    stats.daily[today] = (stats.daily[today] || 0) + 1;
+
+    // Clean up old daily entries (keep last 7 days)
+    const keys = Object.keys(stats.daily).sort();
+    if (keys.length > 7) {
+      keys.slice(0, keys.length - 7).forEach(k => delete stats.daily[k]);
+    }
+
+    await browser.storage.local.set({ handoffStats: stats });
+    loadUsageStats();
+  }
+
+  async function loadUsageStats() {
+    const stored = await browser.storage.local.get(['handoffStats']);
+    const stats = stored.handoffStats || { total: 0, daily: {} };
+    const today = new Date().toISOString().split('T')[0];
+
+    handoffsToday.textContent = (stats.daily[today] || 0).toString();
+    handoffsTotal.textContent = stats.total.toString();
+  }
 
   async function loadStoredContext() {
     const stored = await browser.storage.local.get(['conversation', 'capturedAt', 'messageCount']);
@@ -81,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const timeAgo = getTimeAgo(stored.capturedAt);
       updateStatus(true, `${stored.messageCount} messages (${timeAgo})`);
       enableSendButtons();
+      updateTokenStats(stored.conversation);
     }
   }
 
@@ -103,6 +152,9 @@ document.addEventListener('DOMContentLoaded', () => {
       conversation: stored.conversation
     });
 
+    // Record this handoff for usage tracking
+    await recordHandoff();
+
     showInfo(`Opening ${target === 'chatgpt' ? 'ChatGPT' : 'Gemini'}... Context will be pasted automatically.`);
   }
 
@@ -124,15 +176,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function showError(msg) {
     infoSection.style.display = 'block';
     infoText.textContent = msg;
-    infoSection.style.background = '#3b1f1f';
-    infoText.style.color = '#fca5a5';
+    infoSection.className = 'info info-error';
   }
 
   function showInfo(msg) {
     infoSection.style.display = 'block';
     infoText.textContent = msg;
-    infoSection.style.background = '#1e3a5f';
-    infoText.style.color = '#93c5fd';
+    infoSection.className = 'info';
   }
 
   function hideInfo() {

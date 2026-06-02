@@ -44,6 +44,28 @@
       <p id="info-text"></p>
     </section>
 
+    <section class="stats-panel" id="stats-panel" style="display:none;">
+      <div class="stats-header">Token Estimate</div>
+      <div class="stats-row">
+        <span class="stats-label">Tokens</span>
+        <span class="stats-value" id="token-count">-</span>
+      </div>
+      <div class="stats-row">
+        <span class="stats-label">Characters</span>
+        <span class="stats-value" id="char-count">-</span>
+      </div>
+      <div class="stats-divider"></div>
+      <div class="stats-header">Usage Tracker</div>
+      <div class="stats-row">
+        <span class="stats-label">Handoffs today</span>
+        <span class="stats-value" id="handoffs-today">0</span>
+      </div>
+      <div class="stats-row">
+        <span class="stats-label">Total handoffs</span>
+        <span class="stats-value" id="handoffs-total">0</span>
+      </div>
+    </section>
+
     <footer>
       <button id="btn-clear" class="btn-link">Clear captured context</button>
     </footer>
