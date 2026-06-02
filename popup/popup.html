@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+  <title>SwitchLLM</title>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>SwitchLLM</h1>
+      <p class="subtitle">Transfer AI conversations instantly</p>
+    </header>
+
+    <section class="status" id="status-section">
+      <div class="status-indicator" id="status-indicator">
+        <span class="dot" id="status-dot"></span>
+        <span id="status-text">No conversation captured</span>
+      </div>
+    </section>
+
+    <section class="actions">
+      <button id="btn-grab" class="btn btn-grab">
+        <span class="btn-icon">&#8595;</span>
+        Grab from Claude
+      </button>
+
+      <div class="divider">
+        <span>then send to</span>
+      </div>
+
+      <button id="btn-chatgpt" class="btn btn-send" disabled>
+        <span class="btn-icon">&#8599;</span>
+        Send to ChatGPT
+      </button>
+
+      <button id="btn-gemini" class="btn btn-send" disabled>
+        <span class="btn-icon">&#8599;</span>
+        Send to Gemini
+      </button>
+    </section>
+
+    <section class="info" id="info-section" style="display:none;">
+      <p id="info-text"></p>
+    </section>
+
+    <footer>
+      <button id="btn-clear" class="btn-link">Clear captured context</button>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
